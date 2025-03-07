@@ -1,0 +1,59 @@
+# Visual Studio cache and build files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build and publish output
+bin/
+obj/
+out/
+
+# Logs and debugging
+*.log
+*.tlog
+*.pdb
+*.mdb
+*.opendb
+
+# Entity Framework migrations and generated files
+Migrations/
+*.mdf
+*.ldf
+*.dbmdl
+
+# Database and config files
+appsettings.json
+appsettings.Development.json
+secrets.json
+
+# Package management
+packages/
+*.nupkg
+*.nuspec
+project.lock.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Resharper
+*.DotSettings.user
+
+# Misc
+*.bak
+*.tmp
+~$*
+Thumbs.db
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+
+# Node (if using Vue/React frontend)
+node_modules/
+dist/
+
+# Environment variables
+.env

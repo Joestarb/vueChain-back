@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("vueChain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+760d3381ebb36e8af8f50ead52781ba25c53e3d7")]
 [assembly: System.Reflection.AssemblyProductAttribute("vueChain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("vueChain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
