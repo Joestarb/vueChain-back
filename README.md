@@ -44,10 +44,9 @@ Desarrollar una aplicación web que permita a los usuarios monitorear precios de
 - Vue.js - Framework para el desarrollo de la interfaz de usuario
 - Vue Router - Manejo de navegación entre vistas
 - Axios - Comunicación con el backend
-- Prime Vue - Estilización rápida y responsiva
-- Vee Validate - Validación de formularios
+- TailwindCss - Estilización rápida y responsiva
 - Vue Query - Manejo de peticiones y caché de datos
-- Vue Toastification - Notificaciones de alerta
+- SweetAlert - Notificaciones de alerta
 
 📊 Visualización de Datos
 
