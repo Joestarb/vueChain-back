@@ -1,8 +1,18 @@
+using vueChain.Interfaces;
+using vueChain.Services;
+using vueChain.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSwaggerGen(); // Agrega esta línea
+builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -20,8 +30,8 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.UseSwagger(); // Agrega esta línea
-app.UseSwaggerUI(c => // Agrega esta línea
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 });

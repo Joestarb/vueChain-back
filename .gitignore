@@ -57,3 +57,6 @@ dist/
 
 # Environment variables
 .env
+
+# Ignore all files in the obj directory
+obj/
