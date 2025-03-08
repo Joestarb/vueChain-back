@@ -2,10 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using vueChain.Interfaces;
 using vueChain.Dtos;
 using vueChain.Models;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace vueChain.Controllers
 {
@@ -15,11 +11,13 @@ namespace vueChain.Controllers
     {
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
+        private readonly IAuthService _authService;
 
-        public AuthController(IUserService userService, IConfiguration configuration)
+        public AuthController(IUserService userService, IConfiguration configuration, IAuthService authService)
         {
             _userService = userService;
             _configuration = configuration;
+            _authService = authService;
         }
 
         [HttpPost("register")]
@@ -32,13 +30,13 @@ namespace vueChain.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserDto userDto)
         {
-            var user = await _userService.GetUserByUsername(userDto.Username);
-            if (user == null || !VerifyPasswordHash(userDto.Password, user.PasswordHash))
+            var token = await _authService.Login(userDto);
+            if (token == null)
             {
                 return Unauthorized();
             }
 
-            var token = GenerateJwtToken(user);
+            var user = await _userService.GetUserByUsername(userDto.Username);
             return Ok(new
             {
                 token,
@@ -46,28 +44,6 @@ namespace vueChain.Controllers
                 user.Username,
                 user.Email
             });
-        }
-
-        private bool VerifyPasswordHash(string password, string storedHash)
-        {
-            return BCrypt.Net.BCrypt.Verify(password, storedHash);
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Username)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
     }
 }
