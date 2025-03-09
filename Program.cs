@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 });
 
 // Add JWT authentication
-var key = Encoding.ASCII.GetBytes("your_secret_key_here");
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

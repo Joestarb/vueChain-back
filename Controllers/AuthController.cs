@@ -31,14 +31,14 @@ namespace vueChain.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserDto userDto)
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var token = await _authService.Login(userDto);
+            var token = await _authService.Login(loginDto);
             if (token == null)
             {
                 return Unauthorized();
             }
-            var user = await _userService.GetUserByUsername(userDto.Username);
+            var user = await _userService.GetUserByEmail(loginDto.Email);
 
             var userTokenDto = new UserTokenDto
             {
@@ -66,9 +66,6 @@ namespace vueChain.Controllers
                 return NotFound();
             }
 
-            return NoContent();
-        }
-        
-        
+            return Ok("Token eliminado exitosamente");        }
     }
 }

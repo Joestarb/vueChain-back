@@ -8,5 +8,7 @@ namespace vueChain.Interfaces
         Task<IResult> Register(UserDto userDto);
         
         Task<User> GetUserByUsername(string username);
+        Task<User> GetUserByEmail(string email);
+
     }
 }
