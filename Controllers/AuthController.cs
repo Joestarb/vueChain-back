@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using vueChain.Interfaces;
 using vueChain.Dtos;
 using vueChain.Models;
+using System.Threading.Tasks;
 
 namespace vueChain.Controllers
 {
@@ -55,5 +56,19 @@ namespace vueChain.Controllers
                 user.Email,
             });
         }
+
+        [HttpDelete("logout")]
+        public async Task<IActionResult> Logout([FromBody] TokenDto tokenDto)
+        {
+            var result = await _userTokenService.DeleteUserTokenByToken(tokenDto.Token);
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+        
+        
     }
 }

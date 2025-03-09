@@ -3,6 +3,7 @@ using vueChain.Models;
 using vueChain.Dtos;
 using vueChain.Data;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace vueChain.Services
 {
@@ -30,6 +31,19 @@ namespace vueChain.Services
             await _context.SaveChangesAsync();
 
             return userToken;
+        }
+
+        public async Task<bool> DeleteUserTokenByToken(string token)
+        {
+            var userToken = await _context.UserTokens.FirstOrDefaultAsync(ut => ut.Token == token);
+            if (userToken == null)
+            {
+                return false;
+            }
+
+            _context.UserTokens.Remove(userToken);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
