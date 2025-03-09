@@ -15,5 +15,8 @@ public class UserTokenDto
     public string Email { get; set; }
     [Required]
     public string Role { get; set; }
+    [Required]
+    public DateTime ExpiresAt { get; set; } // Asegúrate de que esta propiedad esté definida
+
 
 }

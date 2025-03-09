@@ -14,7 +14,7 @@ namespace vueChain.Controllers
         private readonly IConfiguration _configuration;
         private readonly IAuthService _authService;
         private readonly IUserTokenService _userTokenService;
-
+        
         public AuthController(IUserService userService, IConfiguration configuration, IAuthService authService, IUserTokenService userTokenService)
         {
             _userService = userService;
@@ -46,6 +46,7 @@ namespace vueChain.Controllers
                 Token = token,
                 Email = user.Email,
                 Role = user.Role
+
             };
             var userToken = await _userTokenService.CreateUserToken(userTokenDto);
 
@@ -59,15 +60,22 @@ namespace vueChain.Controllers
             });
         }
 
-        [HttpDelete("logout")]
-        public async Task<IActionResult> Logout([FromBody] TokenDto tokenDto)
+        [HttpPost("verify-token")]
+        public async Task<IActionResult> VerifyToken([FromBody] TokenDto tokenDto)
         {
-            var result = await _userTokenService.DeleteUserTokenByToken(tokenDto.Token);
-            if (!result)
+            var userToken = await _userTokenService.GetUserTokenByToken(tokenDto.Token);
+            if (userToken == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
 
-            return Ok("Token eliminado exitosamente");        }
+            return Ok(new
+            {
+                userToken.Username,
+                userToken.Email,
+                userToken.Role,
+                ExpiresAt = userToken.expires_at 
+            });
+        }
     }
 }
