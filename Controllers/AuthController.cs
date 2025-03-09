@@ -44,7 +44,8 @@ namespace vueChain.Controllers
             {
                 Username = user.Username,
                 Token = token,
-                Email = user.Email
+                Email = user.Email,
+                Role = user.Role
             };
             var userToken = await _userTokenService.CreateUserToken(userTokenDto);
 
@@ -54,6 +55,7 @@ namespace vueChain.Controllers
                 user.Id,
                 user.Username,
                 user.Email,
+                user.Role,
             });
         }
 

@@ -23,6 +23,7 @@ namespace vueChain.Services
                 Username = userTokenDto.Username,
                 Token = userTokenDto.Token,
                 Email = userTokenDto.Email,
+                Role = userTokenDto.Role,
                 created_at = DateTime.UtcNow,
                 expires_at = DateTime.UtcNow.AddDays(7)
             };

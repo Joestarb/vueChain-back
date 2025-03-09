@@ -32,7 +32,8 @@ namespace vueChain.Services
             {
                 Username = userDto.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
-                Email = userDto.Email
+                Email = userDto.Email,
+                Role = userDto.Role
             };
 
             _context.Users.Add(user);

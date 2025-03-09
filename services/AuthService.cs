@@ -21,7 +21,7 @@ namespace vueChain.Services
 
         public async Task<string> Login(LoginDto loginDto)
         {
-            var user = await _userService.GetUserByEmail(loginDto.Email);
+                var user = await _userService.GetUserByEmail(loginDto.Email);
             if (user == null || !VerifyPasswordHash(loginDto.Password, user.PasswordHash))
             {
                 return null;
