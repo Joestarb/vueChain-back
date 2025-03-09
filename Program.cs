@@ -13,9 +13,21 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserTokenService, UserTokenService>();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add CORS services
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 // Add JWT authentication
 var key = Encoding.ASCII.GetBytes("your_secret_key_here");
@@ -50,12 +62,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Apply the CORS policy
+app.UseCors("AllowAll");
+
 app.UseAuthorization();
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "VueChain API V1");
 });
 
 app.MapControllerRoute(
