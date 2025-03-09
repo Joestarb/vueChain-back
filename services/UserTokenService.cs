@@ -46,5 +46,11 @@ namespace vueChain.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        
+        // services/UserTokenService.cs
+        public async Task<UserToken> GetUserTokenByToken(string token)
+        {
+            return await _context.UserTokens.FirstOrDefaultAsync(ut => ut.Token == token);
+        }
     }
 }
