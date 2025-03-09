@@ -12,12 +12,14 @@ namespace vueChain.Controllers
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
         private readonly IAuthService _authService;
+        private readonly IUserTokenService _userTokenService;
 
-        public AuthController(IUserService userService, IConfiguration configuration, IAuthService authService)
+        public AuthController(IUserService userService, IConfiguration configuration, IAuthService authService, IUserTokenService userTokenService)
         {
             _userService = userService;
             _configuration = configuration;
             _authService = authService;
+            _userTokenService = userTokenService;
         }
 
         [HttpPost("register")]
@@ -32,18 +34,25 @@ namespace vueChain.Controllers
         {
             var token = await _authService.Login(userDto);
             if (token == null)
-                
             {
                 return Unauthorized();
             }
-
             var user = await _userService.GetUserByUsername(userDto.Username);
+
+            var userTokenDto = new UserTokenDto
+            {
+                Username = user.Username,
+                Token = token,
+                Email = user.Email
+            };
+            var userToken = await _userTokenService.CreateUserToken(userTokenDto);
+
             return Ok(new
             {
                 token,
                 user.Id,
                 user.Username,
-                user.Email
+                user.Email,
             });
         }
     }
