@@ -21,7 +21,12 @@ namespace vueChain.Services
 
         public async Task<string> Login(UserDto userDto)
         {
-            var user = await _userService.GetUserByUsername(userDto.Username);
+            var user = new User
+            {
+                Username = userDto.Username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
+                Email = userDto.Email
+            };
             if (user == null || !VerifyPasswordHash(userDto.Password, user.PasswordHash))
             {
                 return null;

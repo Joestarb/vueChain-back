@@ -5,7 +5,8 @@ namespace vueChain.Interfaces
 {
     public interface IUserService
     {
-        Task<User> Register(UserDto userDto);
+        Task<IResult> Register(UserDto userDto);
+        
         Task<User> GetUserByUsername(string username);
     }
 }
