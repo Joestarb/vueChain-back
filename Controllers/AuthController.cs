@@ -59,7 +59,18 @@ namespace vueChain.Controllers
                 user.Role,
             });
         }
+        
+        [HttpDelete("logout")]
+        public async Task<IActionResult> Logout([FromBody] TokenDto tokenDto)
+        {
+            var result = await _userTokenService.DeleteUserTokenByToken(tokenDto.Token);
+            if (!result)
+            {
+                return NotFound();
+            }
 
+            return NoContent();
+        }
         [HttpPost("verify-token")]
         public async Task<IActionResult> VerifyToken([FromBody] TokenDto tokenDto)
         {
