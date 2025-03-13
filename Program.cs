@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using vueChain.interfaces;
+using vueChain.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +44,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserTokenService, UserTokenService>();
 builder.Services.AddScoped<ITradingViewService, TradingViewService>();
-
+builder.Services.AddScoped<ILogService, LogService>();
 
 
 
