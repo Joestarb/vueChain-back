@@ -42,12 +42,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserTokenService, UserTokenService>();
 builder.Services.AddScoped<ITradingViewService, TradingViewService>();
-
-
-
-
-
-
+builder.Services.AddScoped<BinanceService>(); // Registrar BinanceService
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
