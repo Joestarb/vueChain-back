@@ -44,11 +44,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserTokenService, UserTokenService>();
 builder.Services.AddScoped<ITradingViewService, TradingViewService>();
+builder.Services.AddScoped<BinanceService>(); 
 builder.Services.AddScoped<ILogService, LogService>();
-
-
-
-
 
 
 // Add DbContext
