@@ -7,7 +7,7 @@ namespace vueChain.Controllers
 {
     [ApiController]
     [Route("api/tradingview")]
-    public class TradingViewController : ControllerBase
+    public class TradingViewController : ControllerBase 
     {
         private readonly ITradingViewService _tradingViewService;
 
