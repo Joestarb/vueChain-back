@@ -11,15 +11,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using vueChain.Dtos;
 using vueChain.Models;
-
+using vueChain.Data;
 
 public class BinanceService
 {
     private readonly BinanceClient _client;
     private readonly ILogger<BinanceService> _logger;
-    private readonly List<TransactionsModel> _transactions;
+    private readonly ApplicationDbContext _context;
 
-    public BinanceService(IConfiguration configuration, ILogger<BinanceService> logger)
+    public BinanceService(IConfiguration configuration, ILogger<BinanceService> logger, ApplicationDbContext context)
     {
         var apiKey = configuration["Binance:ApiKey"];
         var apiSecret = configuration["Binance:ApiSecret"];
@@ -29,60 +29,42 @@ public class BinanceService
             BaseAddress = "https://testnet.binance.vision" // URL del Testnet de Binance
         });
         _logger = logger;
-        _transactions = new List<TransactionsModel>();
+        _context = context;
     }
 
-    public async Task<BinancePlacedOrder> SimulateBuyOrder(string symbol, decimal quantity, decimal price)
+    public async Task SimulateBuyOrder(string symbol, decimal quantity, decimal price, int userId)
     {
-        var result = await _client.Spot.Order.PlaceOrderAsync(symbol, Binance.Net.Enums.OrderSide.Buy, Binance.Net.Enums.OrderType.Limit, quantity, price: price);
-        if (result.Success)
-        {
-            _logger.LogInformation($"Orden de compra simulada: {result.Data}");
-            await LogTransaction(symbol, quantity, price, "Buy");
-            return result.Data;
-        }
-        else
-        {
-            _logger.LogError($"Error al simular la orden de compra: {result.Error}");
-            throw new Exception(result.Error.Message);
-        }
+        // Guardar la transacción en la tabla de transacciones
+        await LogTransaction(symbol, quantity, price, "Buy", userId);
+        _logger.LogInformation($"Orden de compra simulada guardada: {symbol}, {quantity}, {price}");
     }
 
-    public async Task<BinancePlacedOrder> SimulateSellOrder(string symbol, decimal quantity, decimal price)
+    public async Task SimulateSellOrder(string symbol, decimal quantity, decimal price, int userId)
     {
-        var result = await _client.Spot.Order.PlaceOrderAsync(symbol, Binance.Net.Enums.OrderSide.Sell, Binance.Net.Enums.OrderType.Limit, quantity, price: price);
-        if (result.Success)
-        {
-            _logger.LogInformation($"Orden de venta simulada: {result.Data}");
-            await LogTransaction(symbol, quantity, price, "Sell");
-            return result.Data;
-        }
-        else
-        {
-            _logger.LogError($"Error al simular la orden de venta: {result.Error}");
-            throw new Exception(result.Error.Message);
-        }
+        // Guardar la transacción en la tabla de transacciones
+        await LogTransaction(symbol, quantity, price, "Sell", userId);
+        _logger.LogInformation($"Orden de venta simulada guardada: {symbol}, {quantity}, {price}");
     }
 
-    public async Task SetPriceAlert(string symbol, decimal targetPrice, Action<decimal> onPriceReached)
+    public async Task SetPriceAlert(string symbol, decimal targetPrice, Action<decimal> onPriceReached, int userId)
+{
+    var ticker = await _client.Spot.Market.GetPriceAsync(symbol);
+    if (ticker.Success)
     {
-        var ticker = await _client.Spot.Market.GetPriceAsync(symbol);
-        if (ticker.Success)
+        if (ticker.Data.Price >= targetPrice)
         {
-            if (ticker.Data.Price >= targetPrice)
-            {
-                onPriceReached(ticker.Data.Price);
-                await LogTransaction(symbol, 0, targetPrice, "Alert");
-            }
-        }
-        else
-        {
-            _logger.LogError($"Error al obtener el precio del símbolo {symbol}: {ticker.Error}");
-            throw new Exception(ticker.Error.Message);
+            onPriceReached(ticker.Data.Price);
+            await LogTransaction(symbol, 0, targetPrice, "Alert", userId);
         }
     }
+    else
+    {
+        _logger.LogError($"Error al obtener el precio del símbolo {symbol}: {ticker.Error}");
+        throw new Exception(ticker.Error.Message);
+    }
+}
 
-    private async Task LogTransaction(string symbol, decimal quantity, decimal price, string type)
+    private async Task LogTransaction(string symbol, decimal quantity, decimal price, string type, int userId)
     {
         var transaction = new TransactionsModel
         {
@@ -90,10 +72,11 @@ public class BinanceService
             Quantity = quantity,
             Price = price,
             Type = type,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow,
+            UserId = userId
         };
-        _transactions.Add(transaction);
-        await Task.CompletedTask;
+        _context.Transactions.Add(transaction);
+        await _context.SaveChangesAsync();
     }
 
     // Método para obtener la lista de usuarios haciendo ventas P2P
@@ -121,7 +104,7 @@ public class BinanceService
 
     public async Task<IEnumerable<TransactionsDto>> GetTransactions()
     {
-        var transactions = _transactions.Select(t => new TransactionsDto
+        var transactions = _context.Transactions.Select(t => new TransactionsDto
         {
             Symbol = t.Symbol,
             Quantity = t.Quantity,
@@ -132,20 +115,23 @@ public class BinanceService
         return await Task.FromResult(transactions);
     }
 
-    public async Task<BinancePlacedOrder> SimulateP2PBuyOrder(string symbol, decimal quantity, decimal price)
+    public async Task SimulateP2PBuyOrder(string symbol, decimal quantity, decimal price, int userId)
     {
-        // Simulamos la compra P2P llamando al método de compra existente
-        var result = await SimulateBuyOrder(symbol, quantity, price);
-        if (result != null)
+        // Obtener datos del vendedor de la API de Binance
+        var sellers = await GetP2PSellers(symbol);
+        var seller = sellers.FirstOrDefault();
+
+        if (seller != null)
         {
-            _logger.LogInformation($"Orden de compra P2P simulada: {result}");
-            await LogTransaction(symbol, quantity, price, "P2PBuy");
-            return result;
+            _logger.LogInformation($"Datos del vendedor obtenidos: {seller.UserName}");
+
+            // Guardar la transacción en la tabla de transacciones
+            await LogTransaction(symbol, quantity, price, "P2PBuy", userId);
         }
         else
         {
-            _logger.LogError("Error al simular la orden de compra P2P");
-            throw new Exception("Error al simular la orden de compra P2P");
+            _logger.LogError("No se encontraron vendedores para el símbolo especificado.");
+            throw new Exception("No se encontraron vendedores para el símbolo especificado.");
         }
     }
 
