@@ -46,23 +46,23 @@ public class BinanceService
         _logger.LogInformation($"Orden de venta simulada guardada: {symbol}, {quantity}, {price}");
     }
 
-    public async Task SetPriceAlert(string symbol, decimal targetPrice, Action<decimal> onPriceReached)
+    public async Task SetPriceAlert(string symbol, decimal targetPrice, Action<decimal> onPriceReached, int userId)
+{
+    var ticker = await _client.Spot.Market.GetPriceAsync(symbol);
+    if (ticker.Success)
     {
-        var ticker = await _client.Spot.Market.GetPriceAsync(symbol);
-        if (ticker.Success)
+        if (ticker.Data.Price >= targetPrice)
         {
-            if (ticker.Data.Price >= targetPrice)
-            {
-                onPriceReached(ticker.Data.Price);
-                await LogTransaction(symbol, 0, targetPrice, "Alert", 0); // Asumimos que no hay usuario para alertas
-            }
-        }
-        else
-        {
-            _logger.LogError($"Error al obtener el precio del símbolo {symbol}: {ticker.Error}");
-            throw new Exception(ticker.Error.Message);
+            onPriceReached(ticker.Data.Price);
+            await LogTransaction(symbol, 0, targetPrice, "Alert", userId);
         }
     }
+    else
+    {
+        _logger.LogError($"Error al obtener el precio del símbolo {symbol}: {ticker.Error}");
+        throw new Exception(ticker.Error.Message);
+    }
+}
 
     private async Task LogTransaction(string symbol, decimal quantity, decimal price, string type, int userId)
     {
