@@ -95,6 +95,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+// Aplica tu middleware personalizado para logs
+app.UseMiddleware<LoggingMiddleware>();
 
 // Apply the CORS policy
 app.UseCors("AllowAll");
