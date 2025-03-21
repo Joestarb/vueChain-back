@@ -4,7 +4,6 @@ namespace vueChain.Interfaces
     {
         Task<string> GetTradingViewDataAsync();
         Task<string> GetCriptoCurrency();
-         Task<string>  GetCompanies();
         Task<string>  GetCompanies();
     }
 }
