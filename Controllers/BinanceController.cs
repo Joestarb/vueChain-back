@@ -39,18 +39,18 @@ public class BinanceController : ControllerBase
     }
 
     [HttpPost("alert")]
-    public async Task<IActionResult> SetPriceAlert(string symbol, decimal targetPrice)
-    {
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-        _logger.LogInformation($"SetPriceAlert request from IP: {ipAddress}");
+public async Task<IActionResult> SetPriceAlert(string symbol, decimal targetPrice, int userId)
+{
+    var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+    _logger.LogInformation($"SetPriceAlert request from IP: {ipAddress}");
 
-        await _binanceService.SetPriceAlert(symbol, targetPrice, price =>
-        {
-            // Lógica para manejar la alerta de precio
-            Console.WriteLine($"El precio de {symbol} ha alcanzado {price}");
-        });
-        return Ok();
-    }
+    await _binanceService.SetPriceAlert(symbol, targetPrice, price =>
+    {
+        // Lógica para manejar la alerta de precio
+        Console.WriteLine($"El precio de {symbol} ha alcanzado {price}");
+    }, userId);
+    return Ok();
+}
 
     [HttpGet("p2p/sellers")]
     public async Task<IActionResult> GetP2PSellers(string symbol)
