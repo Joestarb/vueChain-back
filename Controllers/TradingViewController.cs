@@ -7,7 +7,7 @@ namespace vueChain.Controllers
 {
     [ApiController]
     [Route("api/tradingview")]
-    public class TradingViewController : ControllerBase
+    public class TradingViewController : ControllerBase 
     {
         private readonly ITradingViewService _tradingViewService;
 
@@ -16,11 +16,27 @@ namespace vueChain.Controllers
             _tradingViewService = tradingViewService;
         }
 
-        [HttpGet("data")]
+        [HttpGet("bolsa")]
         [Authorize]
         public async Task<IActionResult> GetTradingViewData()
         {
             var data = await _tradingViewService.GetTradingViewDataAsync();
+            return Content(data, "application/javascript");
+        }
+        
+        [HttpGet("cripto-currency")]
+        [Authorize]
+        public async Task<IActionResult> GetCriptoCurrency()
+        {
+            var data = await _tradingViewService.GetCriptoCurrency();
+            return Content(data, "application/javascript");
+        }
+        
+        [HttpGet("get-companies")]
+        [Authorize]
+        public async Task<IActionResult>GetCompanies()
+        {
+            var data = await _tradingViewService.GetCompanies();
             return Content(data, "application/javascript");
         }
     }

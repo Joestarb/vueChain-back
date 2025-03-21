@@ -13,5 +13,6 @@ namespace vueChain.Data
         public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<TransactionsModel> Transactions { get; set; } // Agregar DbSet para transacciones
 
+        public DbSet<Log> Logs { get; set; }
     }
 }

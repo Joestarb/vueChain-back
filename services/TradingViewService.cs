@@ -19,5 +19,20 @@ namespace vueChain.Services
             var response = await _httpClient.GetStringAsync(url);
             return response;
         }
+        public async Task<string> GetCriptoCurrency()
+        {
+            string url = "https://s3.tradingview.com/external-embedding/embed-widget-screener.js";
+            var response = await _httpClient.GetStringAsync(url);
+            return response;
+        }
+        
+        public async Task<string> GetCompanies()
+        {
+            string url = "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
+            var response = await _httpClient.GetStringAsync(url);
+            return response;
+        }
+        
+        
     }
 }
