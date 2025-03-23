@@ -9,6 +9,13 @@ namespace vueChain.Interfaces
         
         Task<User> GetUserByUsername(string username);
         Task<User> GetUserByEmail(string email);
-
+        
+        Task<User> DeleteUser(int  id);
+        
+        Task<IEnumerable<User>> GetAllUsers();
+ 
+         Task<User> EditUser(int id, UserDto userDto);
+        
     }
-}
+} 
+        
