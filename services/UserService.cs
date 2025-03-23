@@ -52,5 +52,41 @@ namespace vueChain.Services
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task<User?> DeleteUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        
+        public async Task<IEnumerable<User>> GetAllUsers()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
+        public async Task<User> EditUser(int id, UserDto userDto)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Username = userDto.Username;
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+            user.Email = userDto.Email;
+            user.Role = userDto.Role;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
     }
 }
