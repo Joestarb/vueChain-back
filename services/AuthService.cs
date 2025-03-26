@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using vueChain.interfaces;
 
 namespace vueChain.Services
 {
@@ -12,22 +13,62 @@ namespace vueChain.Services
     {
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
+        private readonly ILogService _logService; // Inyectamos el servicio de logs
 
-        public AuthService(IUserService userService, IConfiguration configuration)
+        public AuthService(IUserService userService, IConfiguration configuration, ILogService logService)
         {
             _userService = userService;
             _configuration = configuration;
+            _logService = logService;
         }
 
         public async Task<string> Login(LoginDto loginDto)
         {
-                var user = await _userService.GetUserByEmail(loginDto.Email);
-            if (user == null || !VerifyPasswordHash(loginDto.Password, user.PasswordHash))
+            try
             {
-                return null;
-            }
+                // Intento de obtener al usuario por su correo
+                var user = await _userService.GetUserByEmail(loginDto.Email);
+                if (user == null || !VerifyPasswordHash(loginDto.Password, user.PasswordHash))
+                {
+                    // Registrar el intento fallido de inicio de sesión
+                    await _logService.SaveLogAsync(new LogDto
+                    {
+                        Level = "Warning",
+                        Message = "Inicio de sesión fallido",
+                        Source = "AuthService",
+                        Details = $"Credenciales inválidas: Email: {loginDto.Email}"
+                    });
 
-            return GenerateJwtToken(user);
+                    return null;
+                }
+
+                // Generar el token JWT
+                var token = GenerateJwtToken(user);
+
+                // Registrar el inicio de sesión exitoso
+                await _logService.SaveLogAsync(new LogDto
+                {
+                    Level = "Info",
+                    Message = "Inicio de sesión exitoso",
+                    Source = "AuthService",
+                    Details = $"Usuario: {user.Username}, Email: {user.Email}, TokenGeneratedAt: {DateTime.UtcNow}"
+                });
+
+                return token;
+            }
+            catch (Exception ex)
+            {
+                // Registrar errores inesperados
+                await _logService.SaveLogAsync(new LogDto
+                {
+                    Level = "Error",
+                    Message = "Ocurrió un error durante el inicio de sesión",
+                    Source = "AuthService",
+                    Details = $"Email: {loginDto.Email}, Error: {ex.Message}, StackTrace: {ex.StackTrace}"
+                });
+
+                throw; // Relanzar la excepción
+            }
         }
 
         private bool VerifyPasswordHash(string password, string storedHash)
